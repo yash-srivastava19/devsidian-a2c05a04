@@ -1,46 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getProject } from '@/services/projectService';
-import { Project, Entry } from '@/types';
-import { Button } from '@/components/ui/button';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Badge } from '@/components/ui/badge';
+import { Project } from '@/types';
 import Layout from '@/components/Layout';
 import ShareProject from '@/components/ShareProject';
-import { 
-  Calendar, 
-  Clock, 
-  Code, 
-  ExternalLink, 
-  Github, 
-  Plus, 
-  Share2 
-} from 'lucide-react';
-
-const MoodIcon = ({ mood }: { mood: Entry['mood'] }) => {
-  switch (mood) {
-    case 'productive':
-      return <span title="Productive">🚀</span>;
-    case 'stuck':
-      return <span title="Stuck">😓</span>;
-    case 'learning':
-      return <span title="Learning">📚</span>;
-    case 'refactoring':
-      return <span title="Refactoring">🔧</span>;
-    case 'planning':
-      return <span title="Planning">🗓️</span>;
-    default:
-      return null;
-  }
-};
+import ProjectHeader from '@/components/project/ProjectHeader';
+import ProjectTags from '@/components/project/ProjectTags';
+import ProjectTimeline from '@/components/project/ProjectTimeline';
+import ProjectInfo from '@/components/project/ProjectInfo';
+import ProjectStats from '@/components/project/ProjectStats';
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -108,256 +77,25 @@ const ProjectDetail = () => {
   return (
     <Layout>
       <div className="space-y-8 animate-fade-in">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-sm mb-2">
-              <Link to="/" className="text-muted-foreground hover:text-foreground">
-                Projects
-              </Link>
-              <span className="text-muted-foreground">/</span>
-              <span className="font-medium">{project.title}</span>
-            </div>
-            <h1 className="text-3xl font-handwritten font-bold">{project.title}</h1>
-            <p className="text-muted-foreground mt-1">{project.description}</p>
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setShareDialogOpen(true)}
-              className="notion-button"
-            >
-              <Share2 className="mr-1 h-4 w-4" />
-              Share
-            </Button>
-            <Button asChild className="bg-theme-500 hover:bg-theme-400 text-white">
-              <Link to={`/project/${project.id}/new-entry`}>
-                <Plus className="mr-1 h-4 w-4" />
-                Log Progress
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <ProjectHeader 
+          project={project} 
+          onShareClick={() => setShareDialogOpen(true)} 
+        />
 
-        <div className="flex flex-wrap gap-1">
-          {project.tags.map((tag, index) => (
-            <Badge 
-              key={index} 
-              variant="secondary" 
-              className="bg-theme-50 text-theme-500 dark:bg-theme-900 dark:text-theme-200 font-handwritten"
-            >
-              {tag}
-            </Badge>
-          ))}
-        </div>
+        <ProjectTags tags={project.tags} />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <Card className="notion-card border-theme-200">
-              <CardHeader>
-                <CardTitle className="font-handwritten">Development Timeline</CardTitle>
-                <CardDescription>
-                  Journey started on {formatDate(project.createdAt)}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {project.entries.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center bg-muted/50 rounded-lg p-8 text-center">
-                    <Calendar size={32} className="text-muted-foreground mb-2" />
-                    <h3 className="font-medium font-handwritten mb-2">No entries yet</h3>
-                    <p className="text-muted-foreground mb-4">Start logging your development progress.</p>
-                    <Button asChild size="sm" className="bg-theme-500 hover:bg-theme-400 text-white">
-                      <Link to={`/project/${project.id}/new-entry`}>
-                        Log Your First Entry
-                      </Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="relative pl-8 space-y-8">
-                    <div className="timeline-line" />
-                    
-                    {project.entries
-                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                      .map((entry) => (
-                        <div key={entry.id} className="relative">
-                          <div className="timeline-dot" />
-                          <div className="bg-card border-theme-200 rounded-md p-4 notion-card">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-semibold text-lg flex items-center gap-2 font-handwritten">
-                                {entry.title} 
-                                <span className="text-xl"><MoodIcon mood={entry.mood} /></span>
-                              </h3>
-                              <time className="text-sm text-muted-foreground">
-                                {formatDate(entry.createdAt)}
-                              </time>
-                            </div>
-                            <div className="space-y-3">
-                              <p className="text-sm">{entry.content}</p>
-                              
-                              {entry.codeSnippet && (
-                                <pre className="code-snippet">
-                                  <code>{entry.codeSnippet}</code>
-                                </pre>
-                              )}
-                              
-                              <div className="flex items-center text-sm text-muted-foreground">
-                                <Clock size={14} className="mr-1" />
-                                <span>Time spent: {formatTime(entry.timeSpent)}</span>
-                              </div>
-                              
-                              {entry.resources && entry.resources.length > 0 && (
-                                <div className="space-y-1">
-                                  <p className="text-sm font-medium font-handwritten">Resources:</p>
-                                  <ul className="text-sm space-y-1">
-                                    {entry.resources.map((resource, index) => (
-                                      <li key={index}>
-                                        <a 
-                                          href={resource} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="text-theme-500 hover:underline flex items-center"
-                                        >
-                                          {resource.length > 50 ? resource.substring(0, 50) + '...' : resource}
-                                          <ExternalLink size={12} className="ml-1" />
-                                        </a>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <ProjectTimeline 
+              project={project} 
+              formatDate={formatDate} 
+              formatTime={formatTime} 
+            />
           </div>
           
           <div>
-            <Card className="notion-card border-theme-200">
-              <CardHeader>
-                <CardTitle className="font-handwritten">Project Info</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-1 font-handwritten">Created</p>
-                  <p className="text-sm text-muted-foreground flex items-center">
-                    <Calendar size={14} className="mr-1" />
-                    {formatDate(project.createdAt)}
-                  </p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium mb-1 font-handwritten">Last Updated</p>
-                  <p className="text-sm text-muted-foreground flex items-center">
-                    <Calendar size={14} className="mr-1" />
-                    {formatDate(project.updatedAt)}
-                  </p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium mb-1 font-handwritten">Entries</p>
-                  <p className="text-sm text-muted-foreground">
-                    {project.entries.length} log entries
-                  </p>
-                </div>
-                
-                {project.githubUrl && (
-                  <div>
-                    <p className="text-sm font-medium mb-1 font-handwritten">GitHub Repository</p>
-                    <a 
-                      href={project.githubUrl}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-theme-500 hover:underline flex items-center"
-                    >
-                      <Github size={14} className="mr-1" />
-                      View on GitHub
-                      <ExternalLink size={12} className="ml-1" />
-                    </a>
-                  </div>
-                )}
-                
-                {project.demoUrl && (
-                  <div>
-                    <p className="text-sm font-medium mb-1 font-handwritten">Live Demo</p>
-                    <a 
-                      href={project.demoUrl}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-theme-500 hover:underline flex items-center"
-                    >
-                      <ExternalLink size={14} className="mr-1" />
-                      View Demo
-                    </a>
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full notion-button" asChild>
-                  <Link to={`/project/${project.id}/edit`}>
-                    Edit Project Details
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
-            
-            <Card className="mt-4 notion-card border-theme-200">
-              <CardHeader>
-                <CardTitle className="font-handwritten">Project Stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm font-medium mb-1 font-handwritten">Total Time Spent</p>
-                    <p className="text-2xl font-bold">
-                      {formatTime(project.entries.reduce((acc, entry) => acc + entry.timeSpent, 0))}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm font-medium mb-1 font-handwritten">Average Session Length</p>
-                    <p className="text-lg">
-                      {project.entries.length > 0 
-                        ? formatTime(Math.round(project.entries.reduce((acc, entry) => acc + entry.timeSpent, 0) / project.entries.length)) 
-                        : '0m'}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm font-medium mb-1 font-handwritten">Most Common Mood</p>
-                    <div className="flex items-center">
-                      {project.entries.length > 0 ? (
-                        <>
-                          <span className="text-xl mr-2">
-                            <MoodIcon mood={(
-                              Object.entries(
-                                project.entries.reduce((acc, entry) => {
-                                  acc[entry.mood] = (acc[entry.mood] || 0) + 1;
-                                  return acc;
-                                }, {} as Record<Entry['mood'], number>)
-                              ).sort((a, b) => b[1] - a[1])[0][0] as Entry['mood']
-                            )} />
-                          </span>
-                          <span className="capitalize">
-                            {Object.entries(
-                              project.entries.reduce((acc, entry) => {
-                                acc[entry.mood] = (acc[entry.mood] || 0) + 1;
-                                return acc;
-                              }, {} as Record<Entry['mood'], number>)
-                            ).sort((a, b) => b[1] - a[1])[0][0]}
-                          </span>
-                        </>
-                      ) : (
-                        'No data yet'
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ProjectInfo project={project} formatDate={formatDate} />
+            <ProjectStats project={project} formatTime={formatTime} />
           </div>
         </div>
         
