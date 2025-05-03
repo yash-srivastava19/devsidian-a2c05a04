@@ -63,22 +63,23 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Dev Journey Chronicle Custom Colors
+				// Updated to black and white theme
 				theme: {
-					DEFAULT: '#9b87f5', // Primary purple
-					50: '#f5f3ff', // Light purple bg
-					100: '#e5deff', // Soft purple
-					200: '#d6bcfa', // Light purple
-					300: '#7E69AB', // Secondary purple
-					400: '#6E59A5', // Tertiary purple
-					500: '#8B5CF6', // Vivid purple
-					800: '#1A1F2C', // Dark purple
-					900: '#0f172a', // Darkest shade
+					DEFAULT: '#333333', // Neutral dark
+					50: '#F9F9F9', // Very light gray
+					100: '#F1F1F1', // Light gray
+					200: '#E1E1E1', // Medium light gray
+					300: '#C8C8C8', // Medium gray
+					400: '#888888', // Dark gray
+					500: '#333333', // Very dark gray
+					800: '#1E1E1E', // Almost black
+					900: '#0F0F0F', // Nearly black
 				}
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
 				mono: ['Fira Code', 'monospace'],
+				handwritten: ['"Caveat"', 'cursive'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from '@/components/ui/badge';
 import Layout from '@/components/Layout';
+import ShareProject from '@/components/ShareProject';
 import { 
   Calendar, 
   Clock, 
@@ -45,6 +46,7 @@ const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -115,15 +117,20 @@ const ProjectDetail = () => {
               <span className="text-muted-foreground">/</span>
               <span className="font-medium">{project.title}</span>
             </div>
-            <h1 className="text-3xl font-bold">{project.title}</h1>
+            <h1 className="text-3xl font-handwritten font-bold">{project.title}</h1>
             <p className="text-muted-foreground mt-1">{project.description}</p>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShareDialogOpen(true)}
+              className="notion-button"
+            >
               <Share2 className="mr-1 h-4 w-4" />
               Share
             </Button>
-            <Button asChild>
+            <Button asChild className="bg-theme-500 hover:bg-theme-400 text-white">
               <Link to={`/project/${project.id}/new-entry`}>
                 <Plus className="mr-1 h-4 w-4" />
                 Log Progress
@@ -134,7 +141,11 @@ const ProjectDetail = () => {
 
         <div className="flex flex-wrap gap-1">
           {project.tags.map((tag, index) => (
-            <Badge key={index} variant="secondary" className="bg-theme-50 text-theme-500 dark:bg-theme-900 dark:text-theme-200">
+            <Badge 
+              key={index} 
+              variant="secondary" 
+              className="bg-theme-50 text-theme-500 dark:bg-theme-900 dark:text-theme-200 font-handwritten"
+            >
               {tag}
             </Badge>
           ))}
@@ -142,9 +153,9 @@ const ProjectDetail = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <Card>
+            <Card className="notion-card border-theme-200">
               <CardHeader>
-                <CardTitle>Development Timeline</CardTitle>
+                <CardTitle className="font-handwritten">Development Timeline</CardTitle>
                 <CardDescription>
                   Journey started on {formatDate(project.createdAt)}
                 </CardDescription>
@@ -153,9 +164,9 @@ const ProjectDetail = () => {
                 {project.entries.length === 0 ? (
                   <div className="flex flex-col items-center justify-center bg-muted/50 rounded-lg p-8 text-center">
                     <Calendar size={32} className="text-muted-foreground mb-2" />
-                    <h3 className="font-medium mb-2">No entries yet</h3>
+                    <h3 className="font-medium font-handwritten mb-2">No entries yet</h3>
                     <p className="text-muted-foreground mb-4">Start logging your development progress.</p>
-                    <Button asChild size="sm">
+                    <Button asChild size="sm" className="bg-theme-500 hover:bg-theme-400 text-white">
                       <Link to={`/project/${project.id}/new-entry`}>
                         Log Your First Entry
                       </Link>
@@ -170,9 +181,9 @@ const ProjectDetail = () => {
                       .map((entry) => (
                         <div key={entry.id} className="relative">
                           <div className="timeline-dot" />
-                          <div className="bg-card border rounded-md p-4 shadow-sm">
+                          <div className="bg-card border-theme-200 rounded-md p-4 notion-card">
                             <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-semibold text-lg flex items-center gap-2">
+                              <h3 className="font-semibold text-lg flex items-center gap-2 font-handwritten">
                                 {entry.title} 
                                 <span className="text-xl"><MoodIcon mood={entry.mood} /></span>
                               </h3>
@@ -196,7 +207,7 @@ const ProjectDetail = () => {
                               
                               {entry.resources && entry.resources.length > 0 && (
                                 <div className="space-y-1">
-                                  <p className="text-sm font-medium">Resources:</p>
+                                  <p className="text-sm font-medium font-handwritten">Resources:</p>
                                   <ul className="text-sm space-y-1">
                                     {entry.resources.map((resource, index) => (
                                       <li key={index}>
@@ -225,13 +236,13 @@ const ProjectDetail = () => {
           </div>
           
           <div>
-            <Card>
+            <Card className="notion-card border-theme-200">
               <CardHeader>
-                <CardTitle>Project Info</CardTitle>
+                <CardTitle className="font-handwritten">Project Info</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium mb-1">Created</p>
+                  <p className="text-sm font-medium mb-1 font-handwritten">Created</p>
                   <p className="text-sm text-muted-foreground flex items-center">
                     <Calendar size={14} className="mr-1" />
                     {formatDate(project.createdAt)}
@@ -239,7 +250,7 @@ const ProjectDetail = () => {
                 </div>
                 
                 <div>
-                  <p className="text-sm font-medium mb-1">Last Updated</p>
+                  <p className="text-sm font-medium mb-1 font-handwritten">Last Updated</p>
                   <p className="text-sm text-muted-foreground flex items-center">
                     <Calendar size={14} className="mr-1" />
                     {formatDate(project.updatedAt)}
@@ -247,7 +258,7 @@ const ProjectDetail = () => {
                 </div>
                 
                 <div>
-                  <p className="text-sm font-medium mb-1">Entries</p>
+                  <p className="text-sm font-medium mb-1 font-handwritten">Entries</p>
                   <p className="text-sm text-muted-foreground">
                     {project.entries.length} log entries
                   </p>
@@ -255,7 +266,7 @@ const ProjectDetail = () => {
                 
                 {project.githubUrl && (
                   <div>
-                    <p className="text-sm font-medium mb-1">GitHub Repository</p>
+                    <p className="text-sm font-medium mb-1 font-handwritten">GitHub Repository</p>
                     <a 
                       href={project.githubUrl}
                       target="_blank" 
@@ -271,7 +282,7 @@ const ProjectDetail = () => {
                 
                 {project.demoUrl && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Live Demo</p>
+                    <p className="text-sm font-medium mb-1 font-handwritten">Live Demo</p>
                     <a 
                       href={project.demoUrl}
                       target="_blank" 
@@ -285,7 +296,7 @@ const ProjectDetail = () => {
                 )}
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full notion-button" asChild>
                   <Link to={`/project/${project.id}/edit`}>
                     Edit Project Details
                   </Link>
@@ -293,21 +304,21 @@ const ProjectDetail = () => {
               </CardFooter>
             </Card>
             
-            <Card className="mt-4">
+            <Card className="mt-4 notion-card border-theme-200">
               <CardHeader>
-                <CardTitle>Project Stats</CardTitle>
+                <CardTitle className="font-handwritten">Project Stats</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm font-medium mb-1">Total Time Spent</p>
+                    <p className="text-sm font-medium mb-1 font-handwritten">Total Time Spent</p>
                     <p className="text-2xl font-bold">
                       {formatTime(project.entries.reduce((acc, entry) => acc + entry.timeSpent, 0))}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium mb-1">Average Session Length</p>
+                    <p className="text-sm font-medium mb-1 font-handwritten">Average Session Length</p>
                     <p className="text-lg">
                       {project.entries.length > 0 
                         ? formatTime(Math.round(project.entries.reduce((acc, entry) => acc + entry.timeSpent, 0) / project.entries.length)) 
@@ -316,7 +327,7 @@ const ProjectDetail = () => {
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium mb-1">Most Common Mood</p>
+                    <p className="text-sm font-medium mb-1 font-handwritten">Most Common Mood</p>
                     <div className="flex items-center">
                       {project.entries.length > 0 ? (
                         <>
@@ -349,6 +360,14 @@ const ProjectDetail = () => {
             </Card>
           </div>
         </div>
+        
+        {project && (
+          <ShareProject
+            project={project}
+            isOpen={shareDialogOpen}
+            onClose={() => setShareDialogOpen(false)}
+          />
+        )}
       </div>
     </Layout>
   );
