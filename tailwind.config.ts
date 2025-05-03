@@ -79,7 +79,7 @@ export default {
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
 				mono: ['Fira Code', 'monospace'],
-				handwritten: ['"Caveat"', 'cursive'],
+				handwritten: ['Inter', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
